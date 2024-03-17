@@ -4,19 +4,20 @@
 
 #define DRIVE_ENA 5
 
-#define DRIVE1_DIR 21
-#define DRIVE2_DIR 20
+#define DRIVE1_DIR 20
+#define DRIVE2_DIR 21
 #define DRIVE3_DIR 16
 #define DRIVE4_DIR 12
 
-#define DRIVE1_PWM 26
-#define DRIVE2_PWM 19
+#define DRIVE1_PWM 19
+#define DRIVE2_PWM 26
 #define DRIVE3_PWM 13
 #define DRIVE4_PWM 6
 
 // LEJS drive algorith
 class Drive_LEJS
 {
+public:
     void motorenSetup()
     {
         gpioSetMode(DRIVE_ENA, PI_OUTPUT);
@@ -26,10 +27,10 @@ class Drive_LEJS
         gpioSetMode(DRIVE3_DIR, PI_OUTPUT);
         gpioSetMode(DRIVE4_DIR, PI_OUTPUT);
 
-        gpioSetPWMfrequency(DRIVE1_PWM, 1000);
-        gpioSetPWMfrequency(DRIVE2_PWM, 1000);
-        gpioSetPWMfrequency(DRIVE3_PWM, 1000);
-        gpioSetPWMfrequency(DRIVE4_PWM, 1000);
+        gpioSetMode(DRIVE1_PWM, PI_OUTPUT);
+        gpioSetMode(DRIVE2_PWM, PI_OUTPUT);
+        gpioSetMode(DRIVE3_PWM, PI_OUTPUT);
+        gpioSetMode(DRIVE4_PWM, PI_OUTPUT);
     }
     int spdToPWM(int speed) //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     {
@@ -39,7 +40,7 @@ class Drive_LEJS
     }
     void motor(int number, int speed)
     {
-        gpioWrite(DRIVE_ENA, HIGH);
+        gpioWrite(DRIVE_ENA, 1);
         // Speed wird bei 100 und -100 gekappt
         if (speed > 100)
             speed = 100;
@@ -48,9 +49,9 @@ class Drive_LEJS
         int pwm = spdToPWM(speed);
         int dir;
         if (speed < 0)
-            dir = LOW;
+            dir = 0;
         else
-            dir = HIGH;
+            dir = 1;
 
         if (number == 1)
             gpioWrite(DRIVE1_DIR, dir);
@@ -133,7 +134,7 @@ class Drive_LEJS
             motor(4, speed + rotation);
         }
     }
-}
+};
 
 int main()
 {
@@ -145,10 +146,13 @@ int main()
 
     Drive_LEJS drive;
     drive.motorenSetup();
-    drive.fahre(0, 100, 0);
+    drive.fahre(1, 20, 0);
     // whait for 'enter'
     std::cin.get();
     drive.fahre(0, 0, 0);
+
+    std::cout << "GPIO terminated" << '\n';
+    gpioWrite(DRIVE_ENA, 0);
     gpioTerminate();
 
     return 0;
