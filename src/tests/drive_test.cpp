@@ -18,8 +18,9 @@
 class Drive_LEJS
 {
 public:
-    void motorenSetup()
+    Drive_LEJS()
     {
+        std::cout << "Drive_LEJS initialised." << '\n';
         gpioSetMode(DRIVE_ENA, PI_OUTPUT);
         gpioWrite(DRIVE_ENA, 0); //=ena
         gpioSetMode(DRIVE1_DIR, PI_OUTPUT);
@@ -136,6 +137,14 @@ public:
     }
 };
 
+class Drive_k
+{
+
+}
+
+#include <iostream>
+#include <conio.h> // for _getch() function
+
 int main()
 {
     if (gpioInitialise() < 0)
@@ -146,10 +155,33 @@ int main()
 
     Drive_LEJS drive;
     drive.motorenSetup();
-    drive.fahre(1, 20, 0);
-    // whait for 'enter'
-    std::cin.get();
-    drive.fahre(0, 0, 0);
+
+    bool driving = true;
+    while (driving)
+    {
+        char key = _getch(); // get a key from the user
+
+        switch (key)
+        {
+            case 'w':
+                drive.fahre(0, 20, 0); // drive forward
+                break;
+            case 'a':
+                drive.fahre(-2, 20, 0); // turn left
+                break;
+            case 's':
+                drive.fahre(4, 20, 0); // drive backward
+                break;
+            case 'd':
+                drive.fahre(2, 20, 0); // turn right
+                break;
+            case 'p': // break when 'p' key is pressed
+                driving = false; // stop driving
+                break;
+        }
+    }
+
+    drive.fahre(0, 0, 0); // stop driving
 
     std::cout << "GPIO terminated" << '\n';
     gpioWrite(DRIVE_ENA, 0);
