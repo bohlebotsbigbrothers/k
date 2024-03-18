@@ -143,7 +143,6 @@ class Drive_k
 }
 
 #include <iostream>
-#include <conio.h> // for _getch() function
 
 int main()
 {
@@ -159,7 +158,8 @@ int main()
     bool driving = true;
     while (driving)
     {
-        char key = _getch(); // get a key from the user
+        char key;
+        std::cin >> key; // read a single character from the user's input
 
         switch (key)
         {
