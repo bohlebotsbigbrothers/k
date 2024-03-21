@@ -68,7 +68,6 @@ public:
         if (number == 2) gpioPWM(DRIVE2_PWM, pwm);
         if (number == 3) gpioPWM(DRIVE3_PWM, pwm);
         if (number == 4) gpioPWM(DRIVE4_PWM, pwm);
-
     }
 
     void fahre(int direction, int speed, int rotation)
@@ -140,9 +139,11 @@ public:
 class Drive_k
 {
 
-}
+};
 
 #include <iostream>
+#include <termios.h>
+#include <unistd.h>
 
 int main()
 {
@@ -153,35 +154,53 @@ int main()
     }
 
     Drive_LEJS drive;
-    drive.motorenSetup();
 
-    bool driving = true;
-    while (driving)
+    struct termios oldSettings, newSettings;
+    tcgetattr(STDIN_FILENO, &oldSettings);
+
+    // Disable canonical mode, echo input, and signals
+    newSettings = oldSettings;
+    newSettings.c_lflag &= ~(ICANON | ECHO | ECHONL | ISIG);
+
+    // Set the new terminal settings
+    tcsetattr(STDIN_FILENO, TCSANOW, &newSettings);
+
+    // Read a single character from the input stream
+    char c;
+    while(c != 'p')
     {
-        char key;
-        std::cin >> key; // read a single character from the user's input
-
-        switch (key)
+        if (read(STDIN_FILENO, &c, 1) == 1) 
         {
-            case 'w':
-                drive.fahre(0, 20, 0); // drive forward
-                break;
-            case 'a':
-                drive.fahre(-2, 20, 0); // turn left
-                break;
-            case 's':
-                drive.fahre(4, 20, 0); // drive backward
-                break;
-            case 'd':
-                drive.fahre(2, 20, 0); // turn right
-                break;
-            case 'p': // break when 'p' key is pressed
-                driving = false; // stop driving
-                break;
+            std::cout << c;
+            switch(c)
+            {
+                case 'w':
+                    drive.fahre(0, 30, 0);
+                    break;
+                case 'a':
+                    drive.fahre(-2, 30, 0);
+                    break;
+                case 's':
+                    drive.fahre(4, 30, 0);
+                    break;
+                case 'd':
+                    drive.fahre(2, 30, 0);
+                    break;
+                case 'q':
+                    drive.fahre(0,0,-20);
+                    break;
+                case 'e':
+                    drive.fahre(0,0,20);
+                    break;
+                case ' ':
+                    drive.fahre(0,0,0);
+                    break;
+            }
         }
     }
 
-    drive.fahre(0, 0, 0); // stop driving
+    // Restore the original terminal settings
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldSettings);
 
     std::cout << "GPIO terminated" << '\n';
     gpioWrite(DRIVE_ENA, 0);
