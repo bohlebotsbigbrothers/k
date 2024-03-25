@@ -1,6 +1,9 @@
 #include <iostream>
+#include <unistd.h>
 #include "pigpio.h"
 #include "vec_drive.h"
+
+#include <termios.h>
 
 class Drive
 {
@@ -72,18 +75,59 @@ public:
     }
 };
 
+#include <chrono>
+
 int main()
 {
     Drive drive;
 
     // create vec from console input
-    Vector2 vec;
-    std::cin >> vec.x >> vec.y;
+    Vector2 vec = {0, 0};
+    /*std::cin >> vec.x >> vec.y;
 
     drive.drive(vec);
     
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard remaining characters in the input buffer
-    std::cin.get();
+    std::cin.get();*/
+
+    struct termios oldSettings, newSettings;
+    tcgetattr(STDIN_FILENO, &oldSettings);
+
+    // Disable canonical mode, echo input, and signals
+    newSettings = oldSettings;
+    newSettings.c_lflag &= ~(ICANON | ECHO | ECHONL | ISIG);
+
+    // Set the new terminal settings
+    tcsetattr(STDIN_FILENO, TCSANOW, &newSettings);
+
+    auto startTime = std::chrono::high_resolution_clock::now();
+    auto previousTime = startTime;
+
+    // Game loop
+    char c;
+    double t = 0;
+    double w = 1.3;
+    int radius = 70;
+    while (c != 'q')
+    {
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - previousTime).count();
+        previousTime = currentTime;
+
+        read(STDIN_FILENO, &c, 1);
+
+        vec.x = sin(t*w)*radius;
+        vec.y = cos(t*w)*radius;
+
+        std::cout << vec.x << " " << vec.y << '\n';
+        drive.drive(vec);
+
+        usleep(100);
+        t+=deltaTime;
+    }
+
+    // Restore the original terminal settings
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldSettings);
 
     drive.terminate();
     return 0;
