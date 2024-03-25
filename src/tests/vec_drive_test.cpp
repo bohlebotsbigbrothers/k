@@ -1,6 +1,7 @@
 #include <iostream>
 #include <unistd.h>
 #include "pigpio.h"
+#include "cmath"
 #include "vec_drive.h"
 
 #include <termios.h>
@@ -41,7 +42,7 @@ public:
         
         for (int i = 0; i < 4; i++)
         {
-            std::cout << sMotor[i] << '\n';
+            //std::cout << sMotor[i] << '\n';
             motor(i, sMotor[i]);
         }
     }
@@ -65,7 +66,8 @@ public:
         if(pwm > 220) pwm = 220; //! eigentlich 229
 
         std::cout << "Motor: " << motor << " PWM: " << pwm << '\n';
-        gpioPWM(pwm_pins[motor], pwm);
+
+        gpioPWM(pwm_pins[motor], round(pwm));
     }
 
     void terminate()
@@ -90,44 +92,26 @@ int main()
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard remaining characters in the input buffer
     std::cin.get();*/
 
-    struct termios oldSettings, newSettings;
-    tcgetattr(STDIN_FILENO, &oldSettings);
-
-    // Disable canonical mode, echo input, and signals
-    newSettings = oldSettings;
-    newSettings.c_lflag &= ~(ICANON | ECHO | ECHONL | ISIG);
-
-    // Set the new terminal settings
-    tcsetattr(STDIN_FILENO, TCSANOW, &newSettings);
-
     auto startTime = std::chrono::high_resolution_clock::now();
     auto previousTime = startTime;
 
-    // Game loop
-    char c;
     double t = 0;
-    double w = 1.3;
-    int radius = 70;
-    while (c != 'q')
+    double w = 3;
+    int radius = 120;
+    for(int i = 0; i < 30000; i++)
     {
         auto currentTime = std::chrono::high_resolution_clock::now();
         float deltaTime = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - previousTime).count();
         previousTime = currentTime;
 
-        read(STDIN_FILENO, &c, 1);
-
         vec.x = sin(t*w)*radius;
         vec.y = cos(t*w)*radius;
 
-        std::cout << vec.x << " " << vec.y << '\n';
         drive.drive(vec);
 
-        usleep(100);
         t+=deltaTime;
+        usleep(1);
     }
-
-    // Restore the original terminal settings
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldSettings);
 
     drive.terminate();
     return 0;
