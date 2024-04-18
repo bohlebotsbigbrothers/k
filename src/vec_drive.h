@@ -3,6 +3,11 @@
 
 using namespace Eigen;
 
+double abs2(Vector2d& v)
+	{
+		return sqrt(pow(v[0],2)+pow(v[1],2));
+	}
+
 void driveVec(Vector2d vec, float *motor)
 	{
 		double motorMultiplier[4] = {0, 0, 0, 0};

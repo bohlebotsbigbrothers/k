@@ -1,7 +1,7 @@
 #include <Eigen/Dense>
 #include <cmath>
 #include <iostream>
-#include <vec_drive.h>
+#include "./vec_drive.h"
 #include "pigpio.h"
 
 using namespace Eigen;
@@ -12,11 +12,6 @@ private:
 	const int ena_pin = 5;
 	const int pwm_pins[4] = {26, 19, 13, 6};
 	const int dir_pins[4] = {21, 20, 16, 12};
-
-	double abs2(Vector2d &v)
-	{
-		return sqrt(pow(v[0],2)+pow(v[1],2));
-	}
 
 public:
 	Drive()
