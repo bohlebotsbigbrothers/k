@@ -30,6 +30,15 @@ void loop(Input_i2c i2c, Drive drive)
 
         double a = double(i2c.ball_direction)/8*PI;
         Vector2d ball(cos(a), sin(a));
+
+        if (i2c.lineSeen==true)
+        {
+            double b = double(i2c.lineDir)/8*PI;
+            Vector2d line(cos(b), sin(a));
+
+            ball = -line;
+        }
+
         ball = ball * 100;
 
         float* motor = nullptr;
