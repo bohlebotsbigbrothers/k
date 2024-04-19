@@ -81,7 +81,8 @@ public:
 	    }
 	    if(brake==false)
 	    {
-		gpiowrite(ena_pin,0);
+		gpioWrite(ena_pin,0);
+	    }
 	}
 	void terminate()
 	{

@@ -26,7 +26,7 @@ void loop(Input_i2c i2c, Drive drive)
         std::cout << "LineUnique" << i2c.lineUnique << '\n' << '\n' << '\n';
 
         double a = double(i2c.ball_direction)/8*PI;
-	a = a*1.1;
+	    a = a*1.1;
         Vector2d ball(cos(a), sin(a));
 
         if (i2c.lineSeen==true)
@@ -57,7 +57,7 @@ int main()
 
     while(i2c.buttonPressed(1,1)==false) 
     {
-	i2c,setLed(0,0,1);
+	i2c.setLed(0,0,1);
 	while(i2c.buttonPressed(0,0)==false)
 	{
 	    usleep(10000);
