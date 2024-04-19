@@ -14,7 +14,8 @@ bool stop = false;
 
 void loop(Input_i2c i2c, Drive drive)
 {
-    while (!stop)
+    i2c.setLed(0,0,Color.GREEN);
+    while (!i2c.button_read(0,0))
     {
         // debug
         i2c.readIr();
@@ -59,7 +60,14 @@ int main()
     Input_i2c i2c;
     Drive drive;
 
-    i2c.setLed(1,0,3);
+    i2c.setLed(0,0,Color.BLUE);
+    float timer = 0;
+    while(i2c.button_read(0,0))
+    {
+        std::cout << "Waiting for (0,0) pressed.\nTime: " << timer << "\n";
+        usleep(100000);
+        timer += 0.1;
+    }
     std::thread t(loop, i2c, drive);
 
     stop = std::cin.get();

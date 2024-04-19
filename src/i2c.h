@@ -1,6 +1,12 @@
 #include <iostream>
 #include "pigpio.h"
 
+#define GROUND_SENSOR = 0x30;
+#define COMPASS = 0x60;
+#define IR_RING = 0x55;
+const int button_devices[8] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27};
+
+
 enum Color
 {
     NONE,
@@ -21,10 +27,7 @@ class Input_i2c
 {
 private:
     const int i2c_pins[2] = {2, 3};
-    const int button_devices[8] = {0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27};
-    const int ground_sensor = 0x30;
-    const int compass = 0x60;
-    const int ir_ring = 0x55;
+
     int led0[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     int led1[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     int handles[8] = {0, 0, 0, 0, 0, 0, 0, 0};
@@ -50,13 +53,13 @@ public:
         handles[1] = i2cOpen(1, button_devices[1], 0);
 
         // ground sensor
-        handles[2] = i2cOpen(1, ground_sensor, 0);
+        handles[2] = i2cOpen(1, GROUND_SENSOR, 0);
 
-        // compass
-        handles[3] = i2cOpen(1, compass, 0);
+        // COMPASS
+        handles[3] = i2cOpen(1, COMPASS, 0);
 
         // ring
-        handles[4] = i2cOpen(1, ir_ring, 0);
+        handles[4] = i2cOpen(1, IR_RING, 0);
 
         std::cout << "I2c input class initialised." << std::endl;
     }
@@ -117,7 +120,7 @@ public:
     }
 
     // random movements
-    void calibrateCompass()
+    void calibrateCOMPASS()
     {
         std::cout << "Calibrating..." << std::endl;
         char buffer[1];
@@ -171,16 +174,16 @@ public:
         gpioDelay(20000);
     }
 
-    void readCompass()
+    void readCOMPASS()
     {
         char buffer[0];
         while (true)
         {
-            uint8_t compasspacket = i2cReadI2CBlockData(handles[3], 0x01, buffer, 1); // i2cReadBlockData not working /:
+            uint8_t COMPASSpacket = i2cReadI2CBlockData(handles[3], 0x01, buffer, 1); // i2cReadBlockData not working /:
 
-            // int compass = compasspacket * 256 + compasspacket2;
+            // int COMPASS = COMPASSpacket * 256 + COMPASSpacket2;
 
-            std::cout << "Compass: " << static_cast<int>(buffer[0]);
+            std::cout << "COMPASS: " << static_cast<int>(buffer[0]);
             std::cout << "\n";
 
             gpioDelay(2000);
