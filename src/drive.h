@@ -42,6 +42,7 @@ public:
 
 		for (int i = 0; i < 4; i++)
 		{
+
 			// std::cout << sMotor[i] << '\n';
 			motor(i, sMotor[i]);
 		}
@@ -72,6 +73,16 @@ public:
 		gpioPWM(pwm_pins[motor], round(pwm));
 	}
 
+	void stop(bool brake=true)
+	{
+	    for(int i=0;i<=3;i++)
+	    {
+		motor(i,0);
+	    }
+	    if(brake==false)
+	    {
+		gpiowrite(ena_pin,0);
+	}
 	void terminate()
 	{
 		gpioWrite(ena_pin, 0);

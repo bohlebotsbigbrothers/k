@@ -14,7 +14,7 @@ bool stop = false;
 
 void loop(Input_i2c i2c, Drive drive)
 {
-        i2c.readIr();
+        /*i2c.readIr();
         std::cout << "Sees a ball: " << i2c.ball_exists << '\n';
         std::cout << "Ball distance: " << i2c.ball_distance << '\n';
         std::cout << "Ball dir: " << i2c.ball_direction << '\n' << '\n' << '\n';
@@ -26,7 +26,6 @@ void loop(Input_i2c i2c, Drive drive)
         std::cout << "LineUnique" << i2c.lineUnique << '\n' << '\n' << '\n';
 
         double a = double(i2c.ball_direction)/8*PI;
-	a = a*1.1;
         Vector2d ball(cos(a), sin(a));
 
         if (i2c.lineSeen==true)
@@ -41,7 +40,9 @@ void loop(Input_i2c i2c, Drive drive)
 
         float* motor = nullptr;
         drive.drive(ball);
-
+*/
+	Vector2d v(150,0);
+	drive.drive(v);
         usleep(10000);
 }
 
@@ -57,18 +58,18 @@ int main()
 
     while(i2c.buttonPressed(1,1)==false) 
     {
-	i2c,setLed(0,0,1);
+
 	while(i2c.buttonPressed(0,0)==false)
 	{
+	    i2c.setLed(0,0,1);
 	    usleep(10000);
 	}
-	while(i2c.buttonPressed(0,0)==true){usleep(10000);}
 	i2c.setLed(0,0,0);
+	while(i2c.buttonPressed(0,0)==true){usleep(10000);}
 	while(i2c.buttonPressed(0,0)==false)
 	{
 	    loop(i2c, drive);
 	}
-	drive.stop();
 	while(i2c.buttonPressed(0,0)==true){usleep(10000);}
 	//i2c.setLed(1,0,0);
 	std::cout << "Terminating.\n";

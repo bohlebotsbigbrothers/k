@@ -58,6 +58,11 @@ public:
         // ring
         handles[4] = i2cOpen(1, ir_ring, 0);
 
+	setLed(0,0,0);
+	setLed(0,1,0);
+	setLed(1,0,0);
+	setLed(1,1,0);
+
         std::cout << "I2c input class initialised." << std::endl;
     }
 
